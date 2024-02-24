@@ -1,4 +1,5 @@
-import { fileURLToPath, URL } from 'node:url'
+//@ts-ignore
+import { fileURLToPath, URL } from 'url'
 import postCssPxToRem from "postcss-pxtorem";
 import autoprefixer from "autoprefixer";
 import { defineConfig } from 'vite'
@@ -8,30 +9,26 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Icons from 'unplugin-icons/vite';
-import IconsResolver from 'unplugin-icons/resolver';
 
-import tailwindcss from 'tailwindcss';
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import legacyPlugin from '@vitejs/plugin-legacy'
 
+import { templateCompilerOptions } from '@tresjs/core'
+
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      ...templateCompilerOptions
+    }),
     vueJsx(),
     AutoImport({
       resolvers: [
         ElementPlusResolver(),
-        IconsResolver({
-          prefix: "Icon"
-        })
       ],
     }),
     Components({
       resolvers: [
         ElementPlusResolver(),
-        IconsResolver({
-          enabledCollections: ["ep"]
-        })
       ],
     }),
     Icons({
@@ -64,22 +61,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@t': fileURLToPath(new URL('./src/types', import.meta.url))
     }
   },
   css: {
     postcss: {
       plugins: [
-        tailwindcss({
-          content: [
-            "./index.html",
-            "./src/**/*.{vue,js,ts,jsx,tsx}",
-          ],
-          theme: {
-            extend: {},
-          },
-          plugins: [],
-        }),
         postCssPxToRem({
           // 自适应，px>rem转换
           rootValue: 16, // 1rem的大小

@@ -1,24 +1,8 @@
-import start from '@/page/start.vue';
+import home from '@/page/home/index.vue';
 const routes = [
   {
     path: "/",
-    component: start
-  },
-  {
-    path: "/link/:id",
-    component: () => import("@/page/link/saing.vue")
-  },
-  {
-    path:"/link",
-    component: () => import("@/page/link/addLink.vue")
-  },
-  {
-    path: "/room/:id",
-    component: () => import("@/page/room/room.vue")
-  },
-  {
-    path: "/room",
-    component: () => import("@/page/room/addRoom.vue")
+    component: home
   }
 ];
 export default routes;

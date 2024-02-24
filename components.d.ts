@@ -7,26 +7,15 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ElAside: typeof import('element-plus/es')['ElAside']
+    BaseBolck: typeof import('./src/components/baseBolck.vue')['default']
+    BaseHighBolck: typeof import('./src/components/baseHighBolck.vue')['default']
+    copy: typeof import('./src/components/baseBolck copy.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElCard: typeof import('element-plus/es')['ElCard']
-    ElContainer: typeof import('element-plus/es')['ElContainer']
-    ElDivider: typeof import('element-plus/es')['ElDivider']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
-    ElHeader: typeof import('element-plus/es')['ElHeader']
-    ElIcon: typeof import('element-plus/es')['ElIcon']
-    ElImage: typeof import('element-plus/es')['ElImage']
-    ElInput: typeof import('element-plus/es')['ElInput']
-    ElMain: typeof import('element-plus/es')['ElMain']
-    ElTooltip: typeof import('element-plus/es')['ElTooltip']
-    IEpMoreFilled: typeof import('~icons/ep/more-filled')['default']
-    IEpPicture: typeof import('~icons/ep/picture')['default']
-    IEpPictureFilled: typeof import('~icons/ep/picture-filled')['default']
-    IEpPlus: typeof import('~icons/ep/plus')['default']
-    InputArea: typeof import('./src/components/inputArea.vue')['default']
-    LeftBar: typeof import('./src/components/leftBar.vue')['default']
+    ElO: typeof import('element-plus/es')['ElO']
+    ElOverlay: typeof import('element-plus/es')['ElOverlay']
+    ElRadio: typeof import('element-plus/es')['ElRadio']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SaingPop: typeof import('./src/components/saingPop.vue')['default']
   }
 }

@@ -33,7 +33,9 @@
     },
     "types": [
       "element-plus/global",
-      "./env.d.ts"
+      "./env.d.ts",
+      "./auto-imports.d.ts",
+      "./components.d.ts"
     ],
     "allowSyntheticDefaultImports": true,
     "jsxImportSource": "vue"

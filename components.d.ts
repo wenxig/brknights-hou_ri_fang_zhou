@@ -7,14 +7,13 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    BaseBolck: typeof import('./src/components/baseBolck.vue')['default']
-    BaseHighBolck: typeof import('./src/components/baseHighBolck.vue')['default']
-    copy: typeof import('./src/components/baseBolck copy.vue')['default']
+    ElAutoResizer: typeof import('element-plus/es')['ElAutoResizer']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
-    ElO: typeof import('element-plus/es')['ElO']
     ElOverlay: typeof import('element-plus/es')['ElOverlay']
     ElRadio: typeof import('element-plus/es')['ElRadio']
+    ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
+    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

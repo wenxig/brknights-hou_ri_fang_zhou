@@ -4,9 +4,10 @@ interface BlockInformsation {
 }
 interface Actor {
   name: string,
-  texteur: THREE.Texture,
+  texteurs: Record<string, THREE.Texture>,
   space: number[][],
-  /** 1:地面 2:高台*/ type: 1 | 2
+  image: string
+  /** 1:地面 2:高台 3:全部 */ type: 1 | 2 | 3
 }
 interface Block {
   name: string,

@@ -13,7 +13,7 @@ function addFpsTask(fun: FpsTaskFunction): Function {
 onLoop(rl => fpsTask.forEach(fn => fn(rl)))
 
 export function useCameraRotateAnimation([b_x, b_y, b_z]: V3, [a_x, a_y, a_z]: V3, camera: TresCamera, speedTimes = 1) {
-  const time = min([ceil(Math.abs((b_x + b_y + b_z) - (a_x + a_y + a_z)) * 10) * speedTimes, 10])!
+  const time = min([ceil(Math.abs((b_x + b_y + b_z) - (a_x + a_y + a_z)) * 10) * speedTimes, 60])!
   let x = (b_x - a_x) / time
   let y = (b_y - a_y) / time
   let z = (b_z - a_z) / time

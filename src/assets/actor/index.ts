@@ -9,9 +9,9 @@ export default {
       "1": texteurs[`wdss.1`]
     },
     space: [
-      [4, 5],
-      [0, 1, 2, 3],
-      [6, 7]
+      [5, 6],
+      [0, 1, 2, 3,],
+      [7, 8]
     ],
     type: 1,
     image: images.wdss,

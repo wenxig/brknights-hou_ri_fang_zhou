@@ -51,6 +51,10 @@ defineExpose<{
     return {
       close() {
         hide()
+        if (actorRef.value!.getActor()) {
+          actorRef.value!.setActor(null)
+          actorRef.value!.setOpacity(0)
+        }
       }
     }
   }

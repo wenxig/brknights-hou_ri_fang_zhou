@@ -18,8 +18,13 @@ onMounted(() => {
 defineExpose<{
   setActor(map: null): void
   setActor(map: Texture, direction: Direction): void
+  getActor(): Texture| null
+  getOpacity(): number
   setOpacity(num: number): void
 }>({
+  getActor() {
+    return materialInstance.value!.map
+  },
   setActor(_map, direction?: Direction) {
     materialInstance.value!.needsUpdate = true
     if (_map && isEmpty(direction)) {
@@ -30,7 +35,7 @@ defineExpose<{
         case Direction.up:
         case Direction.down:
         case Direction.right: {
-          
+
           break
         }
       }
@@ -42,6 +47,9 @@ defineExpose<{
   setOpacity(num) {
     materialInstance.value!.needsUpdate = true
     materialInstance.value!.opacity = num
+  },
+  getOpacity() {
+    return materialInstance.value!.opacity
   }
 })
 

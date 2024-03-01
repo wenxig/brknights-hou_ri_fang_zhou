@@ -7,7 +7,7 @@ interface Actor {
   texteurs: Record<string, THREE.Texture>,
   space: number[][],
   image: string
-  /** 1:地面 2:高台 3:全部 */ type: 1 | 2 | 3
+  type: import("@/types/actor").PositionType
 }
 interface Block {
   name: string,

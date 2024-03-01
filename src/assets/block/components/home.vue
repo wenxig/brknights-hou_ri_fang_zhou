@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { getTexture } from '../texture';
 import BaseBlock from './baseBlock.vue';
-const { home } = await getTexture()
+const textures = await getTexture()
 defineEmits<{
   click: []
 }>()
@@ -16,7 +16,7 @@ defineOptions({
   <TresGroup :position="[0, 0, 0]">
     <TresMesh @click="$emit('click')" :position="[0, 1, 0]">
       <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshStandardMaterial :map="home" transparent />
+      <TresMeshStandardMaterial :map="textures.get('home')" transparent />
     </TresMesh>
     <Suspense>
       <BaseBlock @click="$emit('click')" />

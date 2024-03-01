@@ -11,7 +11,7 @@ const props = defineProps<{
   selecting?: string,
   useShowHitSpace: UseShowHitSpace
 }>()
-const $emit = defineEmits<{
+defineEmits<{
   click: [pos: [row: number, col: number], other: BlockInformsation]
 }>()
 const block = Block[Blocks[props.type]]
@@ -22,7 +22,7 @@ defineExpose<{
   removeActor(): void
   readonly actor: ShallowRef<Actor | undefined>
   block: Block
-  perviewActor(id: string, dir: Direction): { close(): void }
+  perviewActor(id: string, dir: Direction): { close(): void, ok(): void }
 }>({
   actor,
   removeActor() {
@@ -40,7 +40,7 @@ defineExpose<{
     }
   },
   block,
-  perviewActor(id, dir): { close(): void } {
+  perviewActor(id, dir) {
     perviewActor.value = actors[id]
     const { hide, show } = props.useShowHitSpace(props.position, perviewActor.value.space, dir)
     if (actorRef.value) {
@@ -48,12 +48,23 @@ defineExpose<{
       actorRef.value.setOpacity(0.5)
     }
     show()
+    let isOk = false
     return {
       close() {
-        hide()
-        if (actorRef.value!.getActor()) {
-          actorRef.value!.setActor(null)
-          actorRef.value!.setOpacity(0)
+        if (isOk == false) {
+          hide()
+          if (actorRef.value!.getActor()) {
+            actorRef.value!.setActor(null)
+            actorRef.value!.setOpacity(0)
+          }
+        }
+      },
+      ok() {
+        isOk = true
+        actor.value = actors[id]
+        if (actorRef.value) {
+          actorRef.value.setActor(actor.value.texteurs[dir] ?? actor.value.texteurs.all, dir)
+          actorRef.value.setOpacity(1)
         }
       }
     }
@@ -63,18 +74,14 @@ defineExpose<{
 const actorRef = shallowRef<InstanceType<typeof Actor>>()
 const data = computed<BlockInformsation>(() => ({
   actor: actor.value,
-  block: Block[Blocks[props.type]]
+  block
 }))
-
-const handleClick = () => {
-  $emit('click', props.position, data.value!)
-}
 
 </script>
 
 <template>
   <Suspense>
-    <block.el @click="handleClick" />
+    <block.el @click="$emit('click', props.position, data!)" />
   </Suspense>
   <Actor :y="block.isHigh ? 2 : 1" ref="actorRef" v-if="!block.undeploy" />
 </template>

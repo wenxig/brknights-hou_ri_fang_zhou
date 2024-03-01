@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { getTexture } from '../texture';
-const { baseUndeployBlock } = await getTexture()
+const textures = await getTexture()
 
 defineEmits<{
   click: []
@@ -15,6 +15,6 @@ defineOptions({
 <template>
   <TresMesh :position="[0, 0, 0]" @click="$emit('click')">
     <TresBoxGeometry :args="[1, 1, 1]" />
-    <TresMeshStandardMaterial :map="baseUndeployBlock" />
+      <TresMeshStandardMaterial :map="textures.get('baseUndeployBlock')" />
   </TresMesh>
 </template>

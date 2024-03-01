@@ -1,19 +1,20 @@
-<script setup lang='ts'>
-import { computed, ref, ComputedRef, watch } from "vue";
+<script setup lang='tsx'>
+import { UseShowHitSpace } from "@/types/block";
+import { computed, ComputedRef, watch, shallowRef } from "vue";
 import actors from '@/assets/actor';
-import { chunk, floor } from "lodash-es";
+import { chunk, flatten, floor, maxBy } from "lodash-es";
 import type Block from './block.c.vue';
 import { Direction } from "@/types/actor";
 import { Ref } from "vue";
+import { FunctionalComponent } from "vue";
 const props = defineProps<{
   block?: InstanceType<typeof Block>
+  useShowHitSpace: UseShowHitSpace
 }>()
-const open = ref(false);
-const openWithoutAm = ref(false);
-const _block = ref<Block>();
-const position = ref<[row: number, col: number]>([NaN, NaN])
-
-
+const open = shallowRef(false);
+const openWithoutAm = shallowRef(false);
+const _block = shallowRef<Block>();
+const position = shallowRef<[row: number, col: number]>([NaN, NaN])
 const openBlockSettingPop = async (pos: [row: number, col: number], other: BlockInformsation) => {
   position.value = pos
   open.value = true
@@ -21,11 +22,6 @@ const openBlockSettingPop = async (pos: [row: number, col: number], other: Block
 }
 const title = computed(() => props.block?.actor?.name ?? _block.value?.name ?? 'null')
 const selectingBlockPosition = computed(() => (openWithoutAm.value) ? position.value.join('|') : '')
-defineExpose<{
-  openBlockSettingPop: typeof openBlockSettingPop,
-  selecting: ComputedRef<string>,
-  position: Ref<[number, number]>
-}>({ openBlockSettingPop, selecting: selectingBlockPosition, position })
 const $emit = defineEmits<{
   close: [pos: [row: number, col: number]];
   open: [pos: [row: number, col: number]]
@@ -47,9 +43,9 @@ for (const id in actors) {
   }
 }
 
-const innerDrawer = ref(false)
+const innerDrawer = shallowRef(false)
 
-const selectingDir = ref<Direction>(Direction.right)
+const selectingDir = shallowRef<Direction>(Direction.right)
 const allDir = [
   [1, 2, "上", Direction.up],
   [2, 1, "左", Direction.left],
@@ -57,20 +53,54 @@ const allDir = [
   [3, 2, "下", Direction.down],
 ] as const
 
-const selectingActorId = ref('')
-let cleanPerviewHitSpace: () => void
-watch([innerDrawer, selectingDir, selectingActorId], () => {
-  if (innerDrawer.value) {
-    const { close } = props.block!.perviewActor(selectingActorId.value, selectingDir.value)
-    cleanPerviewHitSpace = close
-  }
+const selectingActorId = shallowRef('')
+let cleanPerviewHitSpace: {
+  close(): void;
+  ok(): void;
+}
+watch([innerDrawer, selectingDir, selectingActorId], () => innerDrawer.value && (cleanPerviewHitSpace = props.block!.perviewActor(selectingActorId.value, selectingDir.value)))
+
+let plantPerviewHitSpace: { show(): void; hide(): void; }
+watch(() => props.block?.actor, v => {
+  if (v == null) return plantPerviewHitSpace?.hide()
+  plantPerviewHitSpace = props.useShowHitSpace(position.value, props.block?.actor?.space!, selectingDir.value)
+  plantPerviewHitSpace.show()
 })
+
+const HitSpaceImage: FunctionalComponent<{ actor: Actor }> = ({ actor }) => {
+  return (
+    <div class="-mt-4">
+      <span>攻击范围</span>
+      <div class="h-[120px] grid mt-1" style={{
+        gridTemplateColumns: `repeat(${maxBy(actor.space, v => v.length)!.length}, minmax(0, 1fr))`,
+        width: `${maxBy(actor.space, v => v.length)!.length + (15 / actor.space.length)}rem`
+      }}>
+        {
+          flatten(actor.space.map((row, rowIndex) => {
+            return row.map((element, colIndex) => {
+              if (element != -1) return (<div style={{ 'grid-column': colIndex + 1, 'grid-row': rowIndex + 1 }}
+                class={["border h-4 bg-white w-4 rounded-sm", { '!bg-[#FF9900] !border-[#FF9900]': element == 0 }]} >
+              </div >)
+            })
+          }))
+        }
+      </div >
+    </div >)
+}
+
+
+
+defineExpose<{
+  openBlockSettingPop: typeof openBlockSettingPop,
+  selecting: ComputedRef<string>,
+  position: Ref<[number, number]>,
+}>({ openBlockSettingPop, selecting: selectingBlockPosition, position })
 </script>
 
 <template>
   <ElDrawer v-model="open" :title="title" direction="ltr" @close="handleClose" @open="handleOpen" :show-close="false"
     append-to-body>
-    <div class="plant w-full h-auto" v-if="(!block?.actor) && !block?.block.undeploy">
+    <div class="w-full h-auto" v-if="(!block?.actor) && !block?.block.undeploy">
       <span class="text-white">部署植物</span>
       <div class="w-full h-80 mt-5 flex flex-col">
         <ElAutoResizer v-slot="{ width }">
@@ -84,8 +114,10 @@ watch([innerDrawer, selectingDir, selectingActorId], () => {
                 style="background-color: rgba(255, 255, 255, 0.5);">
                 {{ actor.a.name }}
               </div>
-              <el-drawer v-model="innerDrawer" title="调整" append-to-body @close="cleanPerviewHitSpace">
-                <p>{{ actor.a.name }}</p>
+              <el-drawer v-model="innerDrawer" :title="`调整-${actor.a.name}`" append-to-body
+                @close="cleanPerviewHitSpace?.close()">
+                <HitSpaceImage :actor="actor.a" />
+                <ElDivider />
                 <div>
                   <span>朝向</span>
                   <div class="w-[120px] h-[120px] grid-cols-3 grid">
@@ -95,7 +127,7 @@ watch([innerDrawer, selectingDir, selectingActorId], () => {
                       @click="() => selectingDir = btn[3]">{{ btn[2] }}</button>
                   </div>
                   <button class="button !w-20" @click="() => {
-                    block?.setActor(actor.id, selectingDir)
+                    cleanPerviewHitSpace?.ok()
                     innerDrawer = open = false
                   }">确定</button>
                 </div>
@@ -104,6 +136,9 @@ watch([innerDrawer, selectingDir, selectingActorId], () => {
           </div>
         </ElAutoResizer>
       </div>
+    </div>
+    <div v-else class="w-full h-auto">
+      <HitSpaceImage :actor="block?.actor!" />
     </div>
   </ElDrawer>
 </template>

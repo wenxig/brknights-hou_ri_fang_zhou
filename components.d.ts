@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     ElAutoResizer: typeof import('element-plus/es')['ElAutoResizer']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElDivider: typeof import('element-plus/es')['ElDivider']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElOverlay: typeof import('element-plus/es')['ElOverlay']
     ElRadio: typeof import('element-plus/es')['ElRadio']

@@ -5,8 +5,8 @@ import { Blocks, UseShowHitSpace } from "@/types/block";
 import BlockSettingPop from './blockSettingPop.c.vue';
 import { TresCanvas, TresCamera } from '@tresjs/core';
 import { getTexture } from '@/assets/block/texture';
-import { memoize, isEmpty, maxBy, toNumber, cloneDeep, times } from 'lodash-es';
-import { computed, ref } from 'vue';
+import { isEmpty, maxBy, toNumber, cloneDeep, times } from 'lodash-es';
+import { computed, ref, shallowRef } from 'vue';
 import { Direction } from '@/types/actor';
 import AllBlock from '@/assets/block';
 import map1 from '@/assets/map/1.ts';
@@ -15,7 +15,7 @@ const { selectBlockMask } = await getTexture()
 const longestRow = maxBy(map1.map, v => v.length)!
 const carmeraBasePosition: [x: number, y: number, z: number] = [longestRow.length / 2, map1.map.length * 1.5, map1.map.length * 1]
 const carmeraBaseLookat = [longestRow.length / 2, -map1.map.length, 0] as const
-const blockSettingPop = ref<InstanceType<typeof BlockSettingPop>>()
+const blockSettingPop = shallowRef<InstanceType<typeof BlockSettingPop>>()
 const camera = ref<TresCamera>()
 function handlePopOpen([row, col]: [row: number, col: number]) {
   const { x: b_x, y: b_y, z: b_z } = camera.value!.rotation
@@ -37,14 +37,14 @@ function handlePopClose([row, col]: [row: number, col: number]) {
     useCameraZoomAnimation(1, 10, camera.value)
   }
 }
-const blocks = ref<(InstanceType<typeof Block>)[][]>(Array.from({ length: map1.map.length }).map(() => []))
+const blocks = shallowRef<(InstanceType<typeof Block>)[][]>(Array.from({ length: map1.map.length }).map(() => []))
 
 const selectingBlockRef = computed(() => {
   const kv = blockSettingPop.value?.selecting.split('|').map(toNumber)
   if (!kv) return
   return blocks.value[kv[0]][kv[1]]
 })
-const hitSpace = ref<{ position: [number, number], space: number[][], direction: Direction }>()
+const hitSpace = shallowRef<{ position: [number, number], space: number[][], direction: Direction }>()
 const useShowHitSpace: UseShowHitSpace = (position, space, direction) => {
   hitSpace.value = { position, space, direction }
   return {
@@ -58,7 +58,7 @@ const useShowHitSpace: UseShowHitSpace = (position, space, direction) => {
 }
 
 const hitSpaceBase = new Map<string, Set<string>>()
-const isInHitSpace = memoize((position: [number, number], hitspace: (typeof hitSpace)["value"], originPostiton: [number, number]): boolean => {
+const isInHitSpace = (position: [number, number], hitspace: (typeof hitSpace)["value"], originPostiton: [number, number]): boolean => {
   if (!hitSpace.value) return false
   const key = `${hitSpace.value!.direction}|${JSON.stringify(hitspace!.space)}`
   if (!hitSpaceBase.has(key)) {
@@ -104,10 +104,10 @@ const isInHitSpace = memoize((position: [number, number], hitspace: (typeof hitS
       if (col == -1) return;
       str.add(`[${originPostiton[0] + index - postiton0[0]}|${originPostiton[1] + jndex - postiton0[1]}]`)
     }))
-    return str.has(`[${position[0]}|${position[1]}]`)
+    hitSpaceBase.set(key, str)
   }
   return hitSpaceBase.get(key)!.has(`[${position[0]}|${position[1]}]`)
-});
+};
 </script>
 
 <template>
@@ -142,5 +142,6 @@ const isInHitSpace = memoize((position: [number, number], hitspace: (typeof hitS
     <TresDirectionalLight cast-shadow :position="carmeraBasePosition" :intensity="1" />
   </TresCanvas>
 
-  <BlockSettingPop :block="selectingBlockRef" ref="blockSettingPop" @open="handlePopOpen" @close="handlePopClose" />
+  <BlockSettingPop :block="selectingBlockRef" :use-show-hit-space="useShowHitSpace" ref="blockSettingPop"
+    @open="handlePopOpen" @close="handlePopClose" />
 </template>

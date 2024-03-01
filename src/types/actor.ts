@@ -4,3 +4,8 @@ export enum Direction {
   right,
   down
 }
+export enum PositionType {
+  land,
+  high,
+  both
+}
